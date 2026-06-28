@@ -9,6 +9,7 @@ import com.ecommerce.project.security.jwt.AuthEntryPointJwt;
 import com.ecommerce.project.security.jwt.AuthTokenFilter;
 import com.ecommerce.project.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -103,7 +104,13 @@ public class WebSecurityConfig {
 
 
     @Bean
-    public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initData(
+            RoleRepository roleRepository,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            @Value("${spring.ecom.seed.userPassword}") String userPassword,
+            @Value("${spring.ecom.seed.sellerPassword}") String sellerPassword,
+            @Value("${spring.ecom.seed.adminPassword}") String adminPassword) {
         return args -> {
             // Retrieve or create roles
             Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
@@ -131,17 +138,17 @@ public class WebSecurityConfig {
 
             // Create users if not already present
             if (!userRepository.existsByUserName("user1")) {
-                User user1 = new User("user1", "user1@example.com", passwordEncoder.encode("password1"));
+                User user1 = new User("user1", "user1@example.com", passwordEncoder.encode(userPassword));
                 userRepository.save(user1);
             }
 
             if (!userRepository.existsByUserName("seller1")) {
-                User seller1 = new User("seller1", "seller1@example.com", passwordEncoder.encode("password2"));
+                User seller1 = new User("seller1", "seller1@example.com", passwordEncoder.encode(sellerPassword));
                 userRepository.save(seller1);
             }
 
             if (!userRepository.existsByUserName("admin")) {
-                User admin = new User("admin", "admin@example.com", passwordEncoder.encode("adminPass"));
+                User admin = new User("admin", "admin@example.com", passwordEncoder.encode(adminPassword));
                 userRepository.save(admin);
             }
 
